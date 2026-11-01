@@ -15,6 +15,9 @@
       --roof: #3B4C86;
       --crack: #26180F;
       --alert: #C8492E;
+      --earth-edge: #5a4033;
+      --canyon-entry: #2a120b;
+      --canyon-depth: #1a0c0a;
       --wall: clamp(12px, 5vw, 85px);
       --screen-height: 100vh
     }
@@ -439,15 +442,22 @@
       opacity: .28
     }
 
-    body[data-step="5"] .haze,
-    body[data-step="6"] .haze {
+    body[data-step="5"] .haze {
       opacity: .12
+    }
+
+    body[data-step="6"] .haze {
+      opacity: 0
     }
 
     /* ---------- Jurang: tempat grafik ---------- */
     .canyon {
       position: relative;
-      background: linear-gradient(#2a120b 0, #1a0c0a 30%, #3d1509 75%, #6a2410 100%);
+      background: linear-gradient(to bottom,
+          var(--canyon-entry) 0,
+          var(--canyon-entry) 80px,
+          var(--canyon-depth) 30%,
+          #3d1509 75%, #6a2410 100%);
       color: #fff
     }
 
@@ -458,7 +468,7 @@
       width: var(--wall);
       z-index: 1;
       pointer-events: none;
-      background: repeating-linear-gradient(to bottom, transparent 0 150px, rgba(185, 155, 119, .2) 150px 152px), linear-gradient(#5a4033 0, #3a2a23 20%, #241a16 55%, #120d0b 100%)
+      background: repeating-linear-gradient(to bottom, transparent 0 150px, rgba(185, 155, 119, .2) 150px 152px), linear-gradient(var(--earth-edge) 0, #3a2a23 20%, #241a16 55%, #120d0b 100%)
     }
 
     #walL {
@@ -770,11 +780,13 @@
           </linearGradient>
           <linearGradient id="mudG" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0" stop-color="#5B4031" />
-            <stop offset="1" stop-color="#3A2A21" />
+            <stop offset="1" stop-color="var(--earth-edge)" />
           </linearGradient>
           <linearGradient id="coreG" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#5a1d0e" />
-            <stop offset="1" stop-color="#2a120b" />
+            <stop offset="0" stop-color="#5a3020" />
+            <stop offset=".45" stop-color="#3a1c12" />
+            <stop offset=".85" stop-color="var(--canyon-entry)" />
+            <stop offset="1" stop-color="var(--canyon-entry)" />
           </linearGradient>
           <clipPath id="cL">
             <rect x="-3000" y="0" width="3600" height="700" />
