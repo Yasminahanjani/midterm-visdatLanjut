@@ -782,6 +782,9 @@
           <clipPath id="cR">
             <rect x="600" y="0" width="3600" height="700" />
           </clipPath>
+          <clipPath id="coreLip">
+            <path id="coreLipPath" d="M600 560V700Z" />
+          </clipPath>
         </defs>
 
         <rect width="1200" height="700" fill="url(#sky)" />
@@ -832,7 +835,8 @@
         </g>
 
         <!-- Bagian dalam bumi: terlihat saat tanah terbelah (lebarnya diatur skrip) -->
-        <rect id="core" x="600" y="552" width="0" height="148" fill="url(#coreG)" />
+        <rect id="core" x="600" y="552" width="0" height="148" fill="url(#coreG)" />        <rect id="core" x="600" y="552" width="0" height="148" fill="url(#coreG)"
+          clip-path="url(#coreLip)" />
 
         <!-- Dunia depan: dipotong di x=600 lalu kedua belahan digeser menjauh -->
         <g id="wL" clip-path="url(#cL)">
@@ -1386,31 +1390,54 @@
       }
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) addEventListener("scroll", parallax, { passive: true });
 
-      // Tanah membuka saat transisi; dinding jurang memiliki lebar visual tetap.
-      // Jangan gunakan lebar jurang untuk memaksa lebar grafik Plotly.
-      var gapU = 560, step6 = document.querySelector('.step[data-step="6"]');
+      // Match the SVG opening to the canyon's actual inner edges in CSS pixels.
+      var gapU = 0, sceneHeight = 0;
+      var step6 = document.querySelector('.step[data-step="6"]');
       function geo() {
         var scene = $("scene").getBoundingClientRect();
         var W = scene.width, H = scene.height, sc = Math.max(W / 1200, H / 700);
-        gapU = Math.min(560, 0.8 * W / sc);
+        var leftWall = $("walL").getBoundingClientRect().width;
+        var rightWall = $("walR").getBoundingClientRect().width;
+        sceneHeight = H;
+        gapU = Math.max(0, W - leftWall - rightWall) / sc;
       }
       function split() {
+        var r = step6.getBoundingClientRect();
+        // Finish before the sticky scene releases, leaving a short fully open hold.
+        var progress = clamp((sceneHeight * .9 - r.top) / Math.max(1, r.height - sceneHeight * .25));
+        var g = ease(progress) * gapU;
         var r = step6.getBoundingClientRect(), g = ease(clamp((innerHeight * .85 - r.top) / (innerHeight * .85))) * gapU;
         $("wL").setAttribute("transform", "translate(" + (-g / 2) + ",0)");
         $("wR").setAttribute("transform", "translate(" + (g / 2) + ",0)");
         $("core").setAttribute("x", 600 - g / 2); $("core").setAttribute("width", g);
+        // A broken, gently recessed lip avoids a rectangular band over the terrain.
+        var left = 600 - g / 2, lip = ["M" + left + " 560"];
+        for (var j = 1; j <= 16; j++) {
+          var t = j / 16;
+          var y = 560 + Math.sin(Math.PI * t) * (14 + 4 * Math.sin(j * 2.4));
+          lip.push("L" + (left + g * t) + " " + y);
+        }
+        lip.push("L" + (left + g) + " 700", "L" + left + " 700Z");
+        $("coreLipPath").setAttribute("d", lip.join(" "));
       }
 
       // Dinding jurang bergerigi (kiri menjorok, kanan menonjol)
       var seed = 11;
       function rnd() { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
       function jag() {
-        var H = $("walL").offsetHeight, st = 70, MAXO = 26, n = Math.ceil(H / st), o = [];
-        seed = 11; for (var i = 0; i <= n; i++) o.push(4 + rnd() * 22);
-        var L = ["0 0", "calc(100% - " + o[0] + "px) 0"], R = [(MAXO - o[0]) + "px 0", "100% 0"];
-        var tp = function (y) { return 8 * Math.min(1, y / (innerHeight * .7)); };
-        for (var j = 1; j <= n; j++) { var y = Math.min(j * st, H); L.push("calc(100% - " + (o[j] + tp(y)) + "px) " + y + "px"); R.unshift((MAXO - o[j] + tp(y)) + "px " + y + "px"); }
-        L.push("0 " + H + "px"); R.splice(R.length - 1, 0, "100% " + H + "px");
+        var H = $("walL").offsetHeight, st = 70;
+        var MAXO = Math.min(26, $("walL").getBoundingClientRect().width * .45);
+        var n = Math.ceil(H / st), o = [];
+        seed = 11; for (var i = 0; i <= n; i++) o.push(MAXO * (.15 + rnd() * .7));
+        // Both walls start flush with the two moving slabs; roughness grows below.
+        var L = ["0 0", "100% 0"], R = ["100% 0", "0 0"];
+        var tp = function (y) { return MAXO * .2 * Math.min(1, y / Math.max(1, sceneHeight * .7)); };
+        for (var j = 1; j <= n; j++) {
+          var y = Math.min(j * st, H);
+          L.push("calc(100% - " + (o[j] + tp(y)) + "px) " + y + "px");
+          R.push((MAXO - o[j] + tp(y)) + "px " + y + "px");
+        }
+        L.push("0 " + H + "px"); R.push("100% " + H + "px");
         $("walL").style.clipPath = "polygon(" + L.join(",") + ")"; $("walR").style.clipPath = "polygon(" + R.join(",") + ")";
       }
 
