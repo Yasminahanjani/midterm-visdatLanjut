@@ -20,7 +20,9 @@
     }
 
     @supports (height: 100svh) {
-      :root { --screen-height: 100svh }
+      :root {
+        --screen-height: 100svh
+      }
     }
 
     * {
@@ -535,7 +537,7 @@
       line-height: 1.7
     }
 
-    .txt li + li {
+    .txt li+li {
       margin-top: .5em
     }
 
@@ -715,10 +717,21 @@
         padding: 14px 18px
       }
 
-      .card h2 { font-size: 21px }
-      .card p { font-size: 14px }
-      .hero h1 { font-size: 28px }
-      .dots { display: none }
+      .card h2 {
+        font-size: 21px
+      }
+
+      .card p {
+        font-size: 14px
+      }
+
+      .hero h1 {
+        font-size: 28px
+      }
+
+      .dots {
+        display: none
+      }
     }
 
     @media (prefers-reduced-motion:reduce) {
@@ -972,8 +985,10 @@
     <main class="story">
       <section class="step hero" data-step="0">
         <div class="card">
+          <p>By Yasmina Arethaya H.(203012520038) & Cut Nabilah N. A. (203012520037)</p>
           <h1>Bumi yang Tak Pernah Diam: Membaca Pola Gempa Indonesia 2008–2023</h1>
-          <p>Sebuah desa di kaki gunung, beberapa menit sebelum gempa. Scroll untuk mengikuti apa yang terjadi.</p>
+          <p>Ikuti ilustrasi sebuah desa di kaki gunung, beberapa menit sebelum gempa.</p>
+          <div class="hint" style="color:red">Scroll ke bawah</div>
           <div class="hint" style="color:red">Scroll ke bawah</div>
         </div>
       </section>
@@ -1047,7 +1062,7 @@
             Kita mungkin sudah sering mendengar bahwa Indonesia merupakan
             wilayah rawan gempa. Namun, seberapa sering gempa sebenarnya
             tercatat? Di mana kejadian tersebut terkonsentrasi? Dan apa
-            yang terjadi setelah gempa besar mengguncang suatu wilayah?. 
+            yang terjadi setelah gempa besar mengguncang suatu wilayah?.
             Katalog gempa Indonesia periode November 2008 hingga Januari
             2023 mencatat <strong>89.075 kejadian</strong>, dengan rata-rata
             sekitar <strong>17 gempa per hari</strong>. Bahkan, pada periode
@@ -1064,7 +1079,8 @@
             hingga aktivitas yang tercatat setelah gempa besar.
           </p>
 
-          <br><p>
+          <br>
+          <p>
             <small>
               Perlu diingat, data ini menggambarkan
               <strong>gempa yang tercatat, bukan seluruh gempa yang terjadi</strong>.
