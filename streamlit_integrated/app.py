@@ -1,5 +1,6 @@
 """Integrasi animasi patahan dan tujuh grafik Plotly pada HTML terbaru."""
 from pathlib import Path
+import base64
 import re
 
 import plotly.io as pio
@@ -21,7 +22,9 @@ st.markdown("""
 /* Kunci scroll halaman Streamlit luar: hanya halaman cerita di iframe yang scroll. */
 html, body, #root, [data-testid="stApp"],
 [data-testid="stAppViewContainer"], [data-testid="stMain"] {
+    height: 100vh !important;
     height: 100dvh !important;
+    max-height: 100vh !important;
     max-height: 100dvh !important;
     overflow: hidden !important;
     overscroll-behavior: none !important;
@@ -33,11 +36,13 @@ header[data-testid="stHeader"], footer, [data-testid="stDecoration"] {
     padding: 0 !important;
     margin: 0 !important;
     max-width: 100% !important;
+    height: 100vh !important;
     height: 100dvh !important;
     overflow: hidden !important;
 }
 /* Hindari tinggi iframe tetap (900px) yang memicu scroll kedua. */
 [data-testid="stElementContainer"]:has(iframe) {
+    height: 100vh !important;
     height: 100dvh !important;
     overflow: hidden !important;
 }
@@ -45,6 +50,7 @@ header[data-testid="stHeader"], footer, [data-testid="stDecoration"] {
 iframe[title="streamlit.components.v1.html"] {
     display: block !important;
     width: 100% !important;
+    height: 100vh !important;
     height: 100dvh !important;
     border: 0 !important;
 }
@@ -68,6 +74,10 @@ def assemble_story(template: str, figures: list) -> str:
         responsive_fig = fig.to_dict()
         responsive_fig.setdefault("layout", {}).pop("width", None)
         responsive_fig["layout"]["autosize"] = True
+        # Reserve space for the heatmap's explanatory notes to its right.
+        if i == 7:
+            responsive_fig["layout"]["height"] = 720
+            responsive_fig["layout"]["margin"] = dict(t=100, b=60, l=65, r=430)
         
         plot = pio.to_html(
             responsive_fig,
@@ -83,11 +93,11 @@ def assemble_story(template: str, figures: list) -> str:
         html = re.sub(pattern, lambda _m: opening + plot + closing, html,
                       count=1, flags=re.DOTALL)
     html = html.replace("<!--PLOTLY_JS-->", "")
-    html = html.replace("</style>", """
-    .chart .plotly-graph-div {width:100%!important;max-width:100%!important;transform:none!important}
-    .chart {min-width:0;width:100%}
-    @media(max-width:700px){.txt{padding:0 4px}.chart{border-radius:8px}}
-    </style>""", 1)
+    # Component HTML uses an iframe; local asset URLs must be embedded.
+    image_src = "assets/removed_img.jpeg"
+    if f'src="{image_src}"' in html:
+        image_data = base64.b64encode((BASE / image_src).read_bytes()).decode("ascii")
+        html = html.replace(f'src="{image_src}"', f'src="data:image/jpeg;base64,{image_data}"')
     return html
 
 
