@@ -297,10 +297,10 @@ def create_figures(df):
         legend=dict(x=0.012, y=0.03, xanchor="left", yanchor="bottom", bgcolor="rgba(15,30,48,0.8)",
                     font=dict(color="#DCE6F0", size=12)),
     )
-    kerangka(fig, (f"Tidak merata: separuh catatan berada di hanya {angka(pct_area_50, 1)}% sel peta, membentuk sabuk "
-                   "yang mengikuti batas lempeng.<br>Setiap kotak = sel 0,5° (±55 km); "
-                   "warna = jumlah kejadian pada skala logaritmik."),
-             tinggi=500, lebar=1000, atas=106, bawah=30, kiri=8, kanan=8)
+    # kerangka(fig, (f"Tidak merata: separuh catatan berada di hanya {angka(pct_area_50, 1)}% sel peta, membentuk sabuk "
+    #                "yang mengikuti batas lempeng.<br>Setiap kotak = sel 0,5° (±55 km); "
+    #                "warna = jumlah kejadian pada skala logaritmik."),
+    #          tinggi=500, lebar=1000, atas=106, bawah=30, kiri=8, kanan=8)
     fig.update_geos(domain=dict(x=[0, 0.915], y=[0, 1]))
     figures.append(fig)
 
@@ -345,9 +345,9 @@ def create_figures(df):
                       xaxis_title="Kategori magnitudo", bargap=0.35,
                       yaxis=dict(title="Jumlah kejadian", tickformat=",d",
                                  range=[0, mag_counts["jumlah"].max() * 1.15]))
-    kerangka(fig, ("Hanya ±3 dari setiap 1.000 catatan berkekuatan M≥6, tetapi jumlahnya tetap "
-                   f"{angka(mag_counts['jumlah'].iloc[2])} kejadian (±{angka(per_tahun)} per tahun)."),
-             tinggi=560, lebar=1000, atas=110, bawah=78, kiri=80, kanan=30)
+    # kerangka(fig, ("Hanya ±3 dari setiap 1.000 catatan berkekuatan M≥6, tetapi jumlahnya tetap "
+    #                f"{angka(mag_counts['jumlah'].iloc[2])} kejadian (±{angka(per_tahun)} per tahun)."),
+    #          tinggi=560, lebar=1000, atas=110, bawah=78, kiri=80, kanan=30)
     figures.append(fig)
 
 
@@ -406,10 +406,10 @@ def create_figures(df):
         showlegend=True,
         legend=dict(x=0.995, y=0.03, xanchor="right", yanchor="bottom", bgcolor="rgba(255,255,255,0.9)"),
     )
-    kerangka(fig, (f"Mayoritas catatan kecil dan dangkal (sel tergelap di bagian atas). Gempa M≥6 langka, "
-                   f"tetapi sekitar {angka(facts['pct_M6plus_shallow'] / 10, 0)} dari 10<br>di antaranya juga dangkal. "
-                   "Warna sel = jumlah kejadian (skala logaritmik); sumbu kedalaman terbalik seperti penampang bumi."),
-             tinggi=640, lebar=1000, atas=118, bawah=72, kiri=72, kanan=110)
+    # kerangka(fig, (f"Mayoritas catatan kecil dan dangkal (sel tergelap di bagian atas). Gempa M≥6 langka, "
+    #                f"tetapi sekitar {angka(facts['pct_M6plus_shallow'] / 10, 0)} dari 10<br>di antaranya juga dangkal. "
+    #                "Warna sel = jumlah kejadian (skala logaritmik); sumbu kedalaman terbalik seperti penampang bumi."),
+    #          tinggi=640, lebar=1000, atas=118, bawah=72, kiri=72, kanan=110)
     figures.append(fig)
 
 
