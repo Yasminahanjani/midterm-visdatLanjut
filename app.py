@@ -1,5 +1,6 @@
 """Integrasi animasi patahan dan tujuh grafik Plotly pada HTML terbaru."""
 from pathlib import Path
+import base64
 import re
 
 import plotly.io as pio
@@ -92,6 +93,11 @@ def assemble_story(template: str, figures: list) -> str:
         html = re.sub(pattern, lambda _m: opening + plot + closing, html,
                       count=1, flags=re.DOTALL)
     html = html.replace("<!--PLOTLY_JS-->", "")
+    # Component HTML uses an iframe; local asset URLs must be embedded.
+    image_src = "assets/removed_img.jpeg"
+    if f'src="{image_src}"' in html:
+        image_data = base64.b64encode((BASE / image_src).read_bytes()).decode("ascii")
+        html = html.replace(f'src="{image_src}"', f'src="data:image/jpeg;base64,{image_data}"')
     return html
 
 

@@ -579,6 +579,17 @@
       width: 100% !important
     }
 
+    .design-note .txt p+p {
+      margin-top: 1em
+    }
+
+    .unused-viz img {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto
+    }
+
     /* Only the detailed figure scrolls; the story always fits the viewport. */
     .chart-viewport {
       width: 100%;
@@ -860,8 +871,7 @@
         </g>
 
         <!-- Bagian dalam bumi: terlihat saat tanah terbelah (lebarnya diatur skrip) -->
-        <rect id="core" x="600" y="552" width="0" height="148" fill="url(#coreG)"
-          clip-path="url(#coreLip)" />
+        <rect id="core" x="600" y="552" width="0" height="148" fill="url(#coreG)" clip-path="url(#coreLip)" />
 
         <!-- Dunia depan: dipotong di x=600 lalu kedua belahan digeser menjauh -->
         <g id="wL" clip-path="url(#cL)">
@@ -1001,11 +1011,11 @@
     <main class="story">
       <section class="step hero" data-step="0">
         <div class="card">
-          <p>By Yasmina Arethaya H.(203012520038) & Cut Nabilah N. A. (203012520037)</p>
           <h1>Bumi yang Tak Pernah Diam: Membaca Pola Gempa Indonesia 2008–2023</h1>
           <p>Ikuti ilustrasi sebuah desa di kaki gunung, beberapa menit sebelum gempa.</p>
           <div class="hint" style="color:red">Scroll ke bawah</div>
-          <div class="hint" style="color:red">Scroll ke bawah</div>
+          <br>
+          <p style="font-size:11px">By Yasmina Arethaya H.(203012520038) & Cut Nabilah N. A. (203012520037)</p>
         </div>
       </section>
       <section class="step" data-step="1">
@@ -1320,17 +1330,57 @@
 
               <p>
                 <br>
-              <h2 style="color: #cc7756;">Guncangan pertama bukan akhir cerita.</h2>
+              <h3 style="color: #cc7756; text-align: center;">Guncangan pertama bukan akhir cerita.</h3>
               </p>
 
-              <p>
-                <small>
-                  <strong>Catatan keterbatasan: </strong>
-                  katalog memiliki celah pencatatan sebelum 2015, 39% kedalamannya bernilai
-                  default 10 km, dan sebagian kecil catatan M≥6 tidak terkonfirmasi di katalog USGS. Angka-angka di atas
-                  sudah memperhitungkan keterbatasan tersebut.
-                </small>
-              </p>
+              <br><br>
+              <article class="chapter design-note">
+                <div class="txt reveal">
+                  <div class="eyebrow">
+                    <h3>Catatan Perancangan</h3>
+                  </div>
+                  <hr>
+                  <br>
+                  <p>katalog memiliki celah pencatatan sebelum 2015, 39% kedalamannya bernilai
+                    default 10 km, dan sebagian kecil catatan M≥6 tidak terkonfirmasi di katalog USGS. Angka-angka di
+                    atas
+                    sudah memperhitungkan keterbatasan tersebut.
+                  </p>
+                  <br>
+                  <h4>Visualisasi yang Dipertimbangkan, tetapi Tidak Digunakan</h4>
+
+                  <p>
+                    Visualisasi berikut semula dirancang untuk menunjukkan
+                    konsentrasi historis gempa dangkal bermagnitudo ≥5 di Indonesia.
+                    Namun, visualisasi ini tidak digunakan dalam versi final.
+                  </p>
+
+                  <p>
+                    Ada tiga alasan utama. <strong>Pertama</strong>, cerita final
+                    sudah memuat beberapa peta Indonesia, sehingga tambahan peta ini
+                    membuat bentuk visualisasi menjadi terlalu repetitif.
+                    <strong>Kedua</strong>, pola kepadatan pada peta ini relatif
+                    sulit dibaca oleh audiens umum karena tampil sebagai area kabur,
+                    sehingga perbandingan antarkawasan tidak mudah dilakukan.
+                    <strong>Ketiga</strong>, visualisasi ini berisiko disalahartikan
+                    sebagai peta risiko atau prediksi, padahal yang ditampilkan
+                    hanyalah konsentrasi historis kejadian yang tercatat.
+                  </p>
+
+                  <p>
+                    Karena itu, visualisasi ini diganti dengan bentuk hetmap
+                    yang lebih mudah dipahami dan lebih mendukung pesan utama cerita.
+                  </p>
+                </div>
+
+                <div class="chart unused-viz reveal">
+                  <!--UNUSED_VIZ_START-->
+                  <img src="assets/removed_img.jpeg"
+                    alt="Visualisasi yang tidak digunakan: peta konsentrasi historis gempa dangkal bermagnitudo ≥5 di Indonesia, bukan peta risiko atau prediksi."
+                    width="1087" height="567" loading="lazy" decoding="async">
+                  <!--UNUSED_VIZ_END-->
+                </div>
+              </article>
             </div>
           </div>
         </div>
@@ -1468,7 +1518,7 @@
       }
 
       // Preserve readable labels on detailed figures using a local scroll area.
-      document.querySelectorAll(".chart").forEach(function (el, index) {
+      document.querySelectorAll(".chart:not(.unused-viz)").forEach(function (el, index) {
         el.dataset.chart = index + 1;
         var viewport = document.createElement("div");
         viewport.className = "chart-viewport";
@@ -1495,7 +1545,7 @@
           g.style.transform = 'none';
           if (window.Plotly && g._fullLayout) { window.Plotly.Plots.resize(g); }
         });
-        document.querySelectorAll(".chart").forEach(function (el) {
+        document.querySelectorAll(".chart:not(.unused-viz)").forEach(function (el) {
           var viewport = el.querySelector(".chart-viewport");
           el.querySelector(".chart-hint").hidden = viewport.scrollWidth <= viewport.clientWidth + 1;
         });
