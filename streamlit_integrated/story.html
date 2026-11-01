@@ -15,7 +15,12 @@
       --roof: #3B4C86;
       --crack: #26180F;
       --alert: #C8492E;
-      --wall: clamp(30px, 5vw, 85px)
+      --wall: clamp(12px, 5vw, 85px);
+      --screen-height: 100vh
+    }
+
+    @supports (height: 100svh) {
+      :root { --screen-height: 100svh }
     }
 
     * {
@@ -28,7 +33,8 @@
     body {
       background: var(--sky2);
       color: var(--ink);
-      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+      overflow-wrap: anywhere
     }
 
     .intro {
@@ -39,6 +45,7 @@
       position: sticky;
       top: 0;
       height: 100vh;
+      height: var(--screen-height, 100vh);
       overflow: hidden
     }
 
@@ -51,17 +58,21 @@
     .story {
       position: relative;
       margin-top: -100vh;
+      margin-top: calc(-1 * var(--screen-height, 100vh));
       z-index: 2
     }
 
     .step {
       min-height: 100vh;
+      min-height: var(--screen-height, 100vh);
       display: flex;
       align-items: center;
-      padding: 0 6vw
+      padding: 32px 6vw
     }
 
     .card {
+      width: 100%;
+      min-width: 0;
       max-width: 380px;
       padding: 22px 24px;
       border-radius: 18px;
@@ -99,7 +110,7 @@
     }
 
     .hero h1 {
-      font-size: 40px;
+      font-size: clamp(28px, 4vw, 40px);
       line-height: 1.05;
       font-weight: 800;
       letter-spacing: -.02em;
@@ -483,7 +494,8 @@
     }
 
     .txt {
-      max-width: 780px;
+      width: 100%;
+      max-width: 100%;
       margin-bottom: 3vh;
       position: relative;
       z-index: 4
@@ -497,25 +509,45 @@
     }
 
     .txt p {
-      width: 1150px;
+      width: 100%;
       font-size: 16px;
       line-height: 1.7;
       color: #e6d5c8
     }
 
     .txt-narasi {
-      max-width: 1150px;
+      width: 100%;
+      max-width: 100%;
       margin-bottom: 3vh;
       position: relative;
       z-index: 4;
       color: #e6d5c8
     }
 
+    .txt-narasi p {
+      font-size: 16px;
+      line-height: 1.7
+    }
+
+    .txt ul,
+    .txt ol {
+      padding-inline-start: 1.4em;
+      line-height: 1.7
+    }
+
+    .txt li + li {
+      margin-top: .5em
+    }
+
+    .txt a {
+      color: #f7dba1;
+      text-underline-offset: 3px
+    }
+
     .chart {
       position: relative;
       width: 100%;
       min-width: 0;
-      min-height: 440px;
       margin: 0 auto;
       background: #211B1C;
       border: 1px solid rgba(255, 255, 255, .12);
@@ -533,6 +565,43 @@
 
     .chart .plot-container {
       width: 100% !important
+    }
+
+    /* Only the detailed figure scrolls; the story always fits the viewport. */
+    .chart-viewport {
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scrollbar-width: thin;
+      scrollbar-color: #cc7756 #211b1c
+    }
+
+    .chart-viewport:focus-visible {
+      outline: 3px solid #f7dba1;
+      outline-offset: -3px
+    }
+
+    .chart-content {
+      min-width: 760px
+    }
+
+    .chart[data-chart="5"] .chart-content {
+      min-width: 1240px
+    }
+
+    .chart[data-chart="7"] .chart-content {
+      min-width: 1100px
+    }
+
+    .chart-hint {
+      padding: 10px 14px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #f7dba1
+    }
+
+    .chart-hint[hidden] {
+      display: none
     }
 
     .ph {
@@ -593,11 +662,21 @@
 
     @media (max-width:700px) {
       .lane {
-        width: calc(100% - 44px)
+        width: calc(100% - 40px);
+        padding: 64px 0 80px
       }
 
       .chart {
-        min-height: 340px
+        border-radius: 10px
+      }
+
+      .chapter {
+        margin-bottom: 72px
+      }
+
+      .txt p,
+      .txt-narasi p {
+        font-size: 15px
       }
 
       .txt h2 {
@@ -606,7 +685,7 @@
 
       .step {
         align-items: flex-end;
-        padding: 0 16px 40px
+        padding: 160px 16px max(24px, env(safe-area-inset-bottom))
       }
 
       .hero h1 {
@@ -614,15 +693,32 @@
       }
 
       .hud {
-        width: 150px;
-        top: 12px;
-        right: 12px
+        width: min(150px, calc(100% - 24px));
+        top: max(12px, env(safe-area-inset-top));
+        right: max(12px, env(safe-area-inset-right))
       }
 
       .dots,
-      .gauge span {
+      .gauge {
         display: none
       }
+    }
+
+    @media (max-height:500px) and (orientation:landscape) {
+      .step {
+        align-items: center;
+        padding: 24px 180px 24px 24px
+      }
+
+      .card {
+        max-width: 480px;
+        padding: 14px 18px
+      }
+
+      .card h2 { font-size: 21px }
+      .card p { font-size: 14px }
+      .hero h1 { font-size: 28px }
+      .dots { display: none }
     }
 
     @media (prefers-reduced-motion:reduce) {
@@ -943,7 +1039,7 @@
     <div class="lane">
 
       <article class="chapter" style="margin-bottom: 10px;">
-        <div class="txt-narasi reveal" style="width: 1500px !important;">
+        <div class="txt-narasi reveal">
 
           <h2>Di Balik Ribuan Guncangan</h2>
 
@@ -1293,7 +1389,8 @@
       // Jangan gunakan lebar jurang untuk memaksa lebar grafik Plotly.
       var gapU = 560, step6 = document.querySelector('.step[data-step="6"]');
       function geo() {
-        var W = innerWidth, H = innerHeight, sc = Math.max(W / 1200, H / 700);
+        var scene = $("scene").getBoundingClientRect();
+        var W = scene.width, H = scene.height, sc = Math.max(W / 1200, H / 700);
         gapU = Math.min(560, 0.8 * W / sc);
       }
       function split() {
@@ -1316,23 +1413,49 @@
         $("walL").style.clipPath = "polygon(" + L.join(",") + ")"; $("walR").style.clipPath = "polygon(" + R.join(",") + ")";
       }
 
-      // Plotly sudah responsif: gunakan resize, bukan transform scale.
+      // Preserve readable labels on detailed figures using a local scroll area.
+      document.querySelectorAll(".chart").forEach(function (el, index) {
+        el.dataset.chart = index + 1;
+        var viewport = document.createElement("div");
+        viewport.className = "chart-viewport";
+        viewport.tabIndex = 0;
+        viewport.setAttribute("role", "region");
+        viewport.setAttribute("aria-label", "Grafik " + (index + 1) + ", dapat digeser ke samping");
+        var content = document.createElement("div");
+        content.className = "chart-content";
+        while (el.firstChild) content.appendChild(el.firstChild);
+        viewport.appendChild(content);
+        el.appendChild(viewport);
+        var hint = document.createElement("p");
+        hint.className = "chart-hint";
+        hint.id = "chart-hint-" + (index + 1);
+        hint.textContent = "Geser grafik ke samping untuk melihat seluruh detail. Gunakan tombol panah saat grafik dipilih dengan Tab.";
+        hint.hidden = true;
+        viewport.setAttribute("aria-describedby", hint.id);
+        el.appendChild(hint);
+      });
+
       function fit() {
         document.querySelectorAll('.plotly-graph-div').forEach(function (g) {
           g.style.width = '100%';
           g.style.transform = 'none';
           if (window.Plotly && g._fullLayout) { window.Plotly.Plots.resize(g); }
         });
+        document.querySelectorAll(".chart").forEach(function (el) {
+          var viewport = el.querySelector(".chart-viewport");
+          el.querySelector(".chart-hint").hidden = viewport.scrollWidth <= viewport.clientWidth + 1;
+        });
       }
       if (window.ResizeObserver) {
-        new ResizeObserver(function () { fit(); }).observe(document.querySelector('.lane'));
+        var chartWidth = 0;
+        new ResizeObserver(function (entries) {
+          var width = entries[0].contentRect.width;
+          if (Math.abs(width - chartWidth) > 1) {
+            chartWidth = width;
+            requestAnimationFrame(fit);
+          }
+        }).observe(document.querySelector('.lane'));
       }
-      document.querySelectorAll(".chart").forEach(function (el) {
-        var bar = document.createElement("div"); bar.className = "lockbar"; bar.textContent = "Klik untuk berinteraksi · gulir untuk melanjutkan";
-        el.appendChild(bar);
-        bar.addEventListener("click", function () { bar.style.display = "none"; });
-        el.addEventListener("mouseleave", function () { bar.style.display = "flex"; });
-      });
       var io2 = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io2.unobserve(e.target); } }); }, { threshold: .15 });
       document.querySelectorAll(".reveal").forEach(function (el) { io2.observe(el); });
 
