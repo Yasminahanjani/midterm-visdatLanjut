@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ketika Bumi Berguncang</title>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --ink: #1E2A33;
+      --muted: #51606B;
+      --sky2: #EAF6FC;
+      --roof: #3B4C86;
+      --crack: #26180F;
+      --alert: #C8492E;
+      --wall: clamp(30px, 5vw, 85px)
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0
+    }
+
+    html,
+    body {
+      background: var(--sky2);
+      color: var(--ink);
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif
+    }
+
+    .intro {
+      position: relative
+    }
+
+    .stage {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: hidden
+    }
+
+    #scene {
+      width: 100%;
+      height: 100%;
+      display: block
+    }
+
+    .story {
+      position: relative;
+      margin-top: -100vh;
+      z-index: 2
+    }
+
+    .step {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 0 6vw
+    }
+
+    .card {
+      max-width: 380px;
+      padding: 22px 24px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, .86);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      box-shadow: 0 10px 30px rgba(30, 42, 51, .12);
+      border-left: 5px solid var(--roof)
+    }
+
+    .card .time {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--alert);
+      margin-bottom: 6px
+    }
+
+    .card h2 {
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 800;
+      margin-bottom: 8px
+    }
+
+    .card p {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted)
+    }
+
+    .hero .card {
+      max-width: 440px;
+      border-left: none;
+      background: rgba(255, 255, 255, .78)
+    }
+
+    .hero h1 {
+      font-size: 40px;
+      line-height: 1.05;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: 10px
+    }
+
+    .hero .hint {
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--muted)
+    }
+
+    .step[data-step="3"] .card,
+    .step[data-step="4"] .card,
+    .step[data-step="6"] .card {
+      border-left-color: var(--alert)
+    }
+
+    .hud {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      z-index: 3;
+      width: 190px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, .88);
+      box-shadow: 0 6px 18px rgba(30, 42, 51, .12);
+      font-size: 12px;
+      color: var(--muted)
+    }
+
+    .hud .mag {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--ink);
+      line-height: 1.1
+    }
+
+    .hud svg {
+      width: 100%;
+      height: 34px;
+      display: block;
+      margin-top: 6px
+    }
+
+    .hud polyline {
+      fill: none;
+      stroke: var(--alert);
+      stroke-width: 2;
+      stroke-linejoin: round
+    }
+
+    #seis {
+      transform-origin: center;
+      transform: scaleY(.08);
+      transition: transform .6s
+    }
+
+    body.s1 #seis {
+      transform: scaleY(1)
+    }
+
+    body[data-step="4"] #seis {
+      transform: scaleY(.5)
+    }
+
+    body[data-step="5"] #seis,
+    body[data-step="6"] #seis {
+      transform: scaleY(.08)
+    }
+
+    .dots {
+      position: absolute;
+      right: 22px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      gap: 10px
+    }
+
+    .dots span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: rgba(30, 42, 51, .25);
+      transition: .3s
+    }
+
+    .dots span.on {
+      background: var(--ink);
+      transform: scale(1.35)
+    }
+
+    .t {
+      transition: transform 1.2s cubic-bezier(.5, 0, .2, 1), opacity .9s ease
+    }
+
+    .tb {
+      transform-box: fill-box
+    }
+
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translate(0, 0)
+      }
+
+      20% {
+        transform: translate(-4px, 2px)
+      }
+
+      40% {
+        transform: translate(4px, -2px)
+      }
+
+      60% {
+        transform: translate(-3px, -1px)
+      }
+
+      80% {
+        transform: translate(3px, 2px)
+      }
+    }
+
+    body[data-step="1"] #wc,
+    body[data-step="1"] #wR>g {
+      animation: shake .14s linear infinite
+    }
+
+    body[data-step="2"] #wc,
+    body[data-step="2"] #wR>g {
+      animation: shake .2s linear infinite
+    }
+
+    body[data-step="1"] #hills,
+    body[data-step="2"] #hills {
+      animation: shake .25s linear infinite
+    }
+
+    .ripple {
+      fill: none;
+      stroke: #E8B49A;
+      stroke-width: 3;
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center
+    }
+
+    @keyframes rip {
+      0% {
+        transform: scale(.2);
+        opacity: .9
+      }
+
+      100% {
+        transform: scale(1.6);
+        opacity: 0
+      }
+    }
+
+    body[data-step="1"] .ripple,
+    body[data-step="2"] .ripple {
+      animation: rip 1.8s ease-out infinite
+    }
+
+    .ripple:nth-of-type(2) {
+      animation-delay: .6s !important
+    }
+
+    .ripple:nth-of-type(3) {
+      animation-delay: 1.2s !important
+    }
+
+    .crack {
+      fill: none;
+      stroke: var(--crack);
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      transition: stroke-dashoffset 1.6s ease
+    }
+
+    body.s2 .crack {
+      stroke-dashoffset: 0
+    }
+
+    .fissure {
+      transform-origin: 50% 0;
+      transform: scale(0, 0)
+    }
+
+    body.s2 .fissure {
+      transform: scale(1, 1)
+    }
+
+    .hA .dmg {
+      opacity: 0
+    }
+
+    body.s3 .hA .dmg {
+      opacity: 1
+    }
+
+    .hA {
+      transform-origin: 50% 100%
+    }
+
+    body.s3 .hA {
+      transform: rotate(1.5deg)
+    }
+
+    .hB .ruin {
+      opacity: 0
+    }
+
+    body.s3 .hB .intact {
+      opacity: 0
+    }
+
+    body.s3 .hB .ruin {
+      opacity: 1
+    }
+
+    .hC {
+      transform-origin: 100% 100%
+    }
+
+    body.s3 .hC {
+      transform: translateY(30px) rotate(-22deg)
+    }
+
+    body.s4 .hC {
+      transform: translateY(70px) rotate(-26deg)
+    }
+
+    .mini {
+      transform-origin: 50% 100%
+    }
+
+    body.s3 .mini:nth-child(odd) {
+      transform: rotate(-14deg) translateY(4px)
+    }
+
+    body.s3 .mini:nth-child(even) {
+      transform: rotate(10deg) translateY(6px)
+    }
+
+    .tree {
+      transform-origin: 50% 100%
+    }
+
+    body.s3 .tree {
+      transform: rotate(-62deg)
+    }
+
+    .mud {
+      transform: translateY(130px);
+      opacity: 0
+    }
+
+    body.s4 .mud {
+      transform: translateY(0);
+      opacity: 1
+    }
+
+    .slide {
+      opacity: 0;
+      transform: translate(-40px, -40px)
+    }
+
+    body.s4 .slide {
+      opacity: 1;
+      transform: translate(0, 0)
+    }
+
+    .rock {
+      opacity: 0;
+      transform: translate(0, -90px)
+    }
+
+    body.s4 .rock {
+      opacity: 1;
+      transform: translate(0, 0)
+    }
+
+    .dust {
+      fill: #D9C7B3;
+      opacity: 0;
+      transform-box: fill-box;
+      transform-origin: center
+    }
+
+    @keyframes puff {
+      0% {
+        opacity: 0;
+        transform: scale(.4)
+      }
+
+      40% {
+        opacity: .75
+      }
+
+      100% {
+        opacity: 0;
+        transform: scale(1.8) translateY(-30px)
+      }
+    }
+
+    body[data-step="3"] .dust,
+    body[data-step="4"] .dust {
+      animation: puff 2.6s ease-out infinite
+    }
+
+    .haze {
+      opacity: 0;
+      transition: opacity 1.2s
+    }
+
+    body.s3 .haze {
+      opacity: .28
+    }
+
+    body[data-step="5"] .haze,
+    body[data-step="6"] .haze {
+      opacity: .12
+    }
+
+    /* ---------- Jurang: tempat grafik ---------- */
+    .canyon {
+      position: relative;
+      background: linear-gradient(#2a120b 0, #1a0c0a 30%, #3d1509 75%, #6a2410 100%);
+      color: #fff
+    }
+
+    .walls {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: var(--wall);
+      z-index: 1;
+      pointer-events: none;
+      background: repeating-linear-gradient(to bottom, transparent 0 150px, rgba(185, 155, 119, .2) 150px 152px), linear-gradient(#5a4033 0, #3a2a23 20%, #241a16 55%, #120d0b 100%)
+    }
+
+    #walL {
+      left: 0
+    }
+
+    #walR {
+      right: 0
+    }
+
+    .lane {
+      position: relative;
+      z-index: 2;
+      width: min(1120px, calc(100% - 2 * clamp(46px, 9vw, 130px)));
+      margin: 0 auto;
+      padding: 12vh 0 16vh
+    }
+
+    .chapter {
+      margin-bottom: 15vh
+    }
+
+    .chapter:last-child {
+      margin-bottom: 0
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      font-size: 12px;
+      color: #f7dba1;
+      font-weight: 600
+    }
+
+    .txt {
+      max-width: 780px;
+      margin-bottom: 3vh;
+      position: relative;
+      z-index: 4
+    }
+
+    .txt h2 {
+      font-size: clamp(24px, 3.2vw, 38px);
+      line-height: 1.12;
+      font-weight: 800;
+      margin: 10px 0
+    }
+
+    .txt p {
+      width: 1150px;
+      font-size: 16px;
+      line-height: 1.7;
+      color: #e6d5c8
+    }
+
+    .txt-narasi {
+      max-width: 1150px;
+      margin-bottom: 3vh;
+      position: relative;
+      z-index: 4;
+      color: #e6d5c8
+    }
+
+    .chart {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      min-height: 440px;
+      margin: 0 auto;
+      background: #211B1C;
+      border: 1px solid rgba(255, 255, 255, .12);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 24px 70px rgba(0, 0, 0, .25)
+    }
+
+    .chart .js-plotly-plot,
+    .chart .plotly-graph-div {
+      width: 100% !important;
+      max-width: 100% !important;
+      transform: none !important
+    }
+
+    .chart .plot-container {
+      width: 100% !important
+    }
+
+    .ph {
+      display: grid;
+      place-items: center;
+      min-height: 240px;
+      padding: 1rem;
+      text-align: center;
+      color: #51606B;
+      font-size: 14px
+    }
+
+    .lockbar {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      cursor: pointer;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 6px;
+      font-size: 12px;
+      color: #18263C;
+      background: linear-gradient(transparent 92%, rgba(255, 255, 255, .92))
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s, transform .7s
+    }
+
+    .reveal.in {
+      opacity: 1;
+      transform: none
+    }
+
+    .gauge {
+      position: fixed;
+      left: 0;
+      top: 46%;
+      width: var(--wall);
+      text-align: center;
+      z-index: 20;
+      font-size: 12px;
+      line-height: 1.4;
+      color: #f7dba1;
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none
+    }
+
+    .gauge b {
+      display: block;
+      font-size: 17px;
+      color: #fff
+    }
+
+    @media (max-width:700px) {
+      .lane {
+        width: calc(100% - 44px)
+      }
+
+      .chart {
+        min-height: 340px
+      }
+
+      .txt h2 {
+        font-size: 25px
+      }
+
+      .step {
+        align-items: flex-end;
+        padding: 0 16px 40px
+      }
+
+      .hero h1 {
+        font-size: 30px
+      }
+
+      .hud {
+        width: 150px;
+        top: 12px;
+        right: 12px
+      }
+
+      .dots,
+      .gauge span {
+        display: none
+      }
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+
+      #wc,
+      #wR>g,
+      #hills,
+      .ripple,
+      .dust {
+        animation: none !important
+      }
+
+      .t,
+      .crack,
+      .reveal {
+        transition: none !important
+      }
+    }
+  </style>
+</head>
+
+<body data-step="0" class="s0">
+
+  <div class="intro">
+    <div class="stage">
+      <div class="hud" aria-live="polite">
+        Magnitudo
+        <div class="mag" id="mag">0,0</div>
+        <div id="magNote">Kondisi normal</div>
+        <svg viewBox="0 0 160 34" preserveAspectRatio="none">
+          <g id="seis">
+            <polyline
+              points="0,17 8,17 12,6 16,28 20,10 24,24 28,17 40,17 44,2 48,32 52,8 56,26 60,17 74,17 78,9 82,25 86,13 90,21 94,17 108,17 112,4 116,30 120,10 124,24 128,17 160,17" />
+          </g>
+        </svg>
+      </div>
+      <div class="dots" id="dots"></div>
+
+      <svg id="scene" viewBox="0 0 1200 700" preserveAspectRatio="xMidYMax slice" role="img"
+        aria-label="Ilustrasi desa di kaki gunung yang terdampak gempa lalu tanahnya terbelah">
+        <defs>
+          <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#BEE3F7" />
+            <stop offset=".75" stop-color="#EAF6FC" />
+          </linearGradient>
+          <linearGradient id="earthG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#8A6651" />
+            <stop offset="1" stop-color="#5A4033" />
+          </linearGradient>
+          <linearGradient id="mudG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5B4031" />
+            <stop offset="1" stop-color="#3A2A21" />
+          </linearGradient>
+          <linearGradient id="coreG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5a1d0e" />
+            <stop offset="1" stop-color="#2a120b" />
+          </linearGradient>
+          <clipPath id="cL">
+            <rect x="-3000" y="0" width="3600" height="700" />
+          </clipPath>
+          <clipPath id="cR">
+            <rect x="600" y="0" width="3600" height="700" />
+          </clipPath>
+        </defs>
+
+        <rect width="1200" height="700" fill="url(#sky)" />
+        <circle cx="960" cy="140" r="64" fill="#FFF4D2" opacity=".85" />
+        <g fill="#FFFFFF" opacity=".75">
+          <path d="M170 150c0-18 18-30 36-24 8-16 34-18 44 0 18-4 30 10 26 24z" />
+          <path d="M720 95c0-14 14-24 28-19 7-13 27-14 35 0 14-3 24 8 20 19z" />
+        </g>
+
+        <g class="px" data-depth=".12">
+          <path fill="#A9C8DB"
+            d="M0 380L120 270L220 320L360 165L480 300L600 215L760 330L880 195L1020 310L1120 245L1200 290V700H0Z" />
+          <path fill="#FFFFFF" d="M328 200L360 165L394 204L376 196L362 210L347 196Z" />
+          <path fill="#FFFFFF" d="M850 228L880 195L912 232L894 224L880 238L866 224Z" />
+        </g>
+        <g class="px" data-depth=".25">
+          <path fill="#4E7A3C"
+            d="M0 430C80 385 120 300 190 250C230 222 262 242 292 272C330 310 362 292 402 302C452 316 472 362 522 372C602 388 642 342 702 362C782 392 822 452 902 462C1002 472 1082 432 1200 452V700H0Z" />
+          <path fill="#3F6A31" d="M190 250C220 300 210 360 250 420L150 440C170 380 160 310 190 250Z" />
+          <path fill="#3F6A31" d="M702 362C730 400 720 440 760 480L660 480C690 440 680 400 702 362Z" />
+        </g>
+        <g class="px" data-depth=".4">
+          <g id="hills">
+            <path fill="#7FA84B"
+              d="M0 505C150 462 300 472 450 492C600 512 700 470 850 480C1000 490 1100 522 1200 510V700H0Z" />
+            <path fill="#94BC5E" d="M560 500C680 470 780 478 900 492L900 520L560 530Z" opacity=".7" />
+            <g id="village">
+              <g class="mini tb t">
+                <rect x="606" y="478" width="26" height="20" fill="#F1C995" />
+                <path d="M602 480L619 466L636 480Z" fill="#3B4C86" />
+              </g>
+              <g class="mini tb t">
+                <rect x="648" y="472" width="30" height="22" fill="#E7B585" />
+                <path d="M644 474L663 459L682 474Z" fill="#B5714F" />
+              </g>
+              <g class="mini tb t">
+                <rect x="694" y="476" width="24" height="19" fill="#F1C995" />
+                <path d="M690 478L706 465L722 478Z" fill="#3B4C86" />
+              </g>
+              <g class="mini tb t">
+                <rect x="1010" y="488" width="28" height="20" fill="#E7B585" />
+                <path d="M1006 490L1024 476L1042 490Z" fill="#3B4C86" />
+              </g>
+            </g>
+            <path class="slide t" fill="#6B4C3B"
+              d="M640 486C690 490 720 530 760 572L640 590C626 552 628 515 640 486Z" />
+          </g>
+        </g>
+
+        <!-- Bagian dalam bumi: terlihat saat tanah terbelah (lebarnya diatur skrip) -->
+        <rect id="core" x="600" y="552" width="0" height="148" fill="url(#coreG)" />
+
+        <!-- Dunia depan: dipotong di x=600 lalu kedua belahan digeser menjauh -->
+        <g id="wL" clip-path="url(#cL)">
+          <g id="wc">
+            <path fill="url(#earthG)" d="M0 560C200 538 400 544 600 560C800 576 1000 570 1200 560V700H0Z" />
+            <ellipse class="ripple" cx="600" cy="690" rx="120" ry="40" />
+            <ellipse class="ripple" cx="600" cy="690" rx="120" ry="40" />
+            <ellipse class="ripple" cx="600" cy="690" rx="120" ry="40" />
+
+            <g transform="translate(110,360)">
+              <g class="hA tb t">
+                <rect x="0" y="45" width="210" height="170" fill="#F1C995" />
+                <rect x="0" y="45" width="210" height="10" fill="#E3B47C" />
+                <polygon points="-14,50 28,0 182,0 224,50" fill="#3B4C86" />
+                <rect x="-14" y="46" width="238" height="8" fill="#2E3C6E" />
+                <g fill="#4A9BC0" stroke="#FFF3DE" stroke-width="5">
+                  <rect x="28" y="72" width="50" height="44" />
+                  <rect x="132" y="72" width="50" height="44" />
+                  <rect x="28" y="145" width="50" height="44" />
+                  <rect x="132" y="145" width="50" height="44" />
+                </g>
+                <g stroke="#FFF3DE" stroke-width="3">
+                  <line x1="53" y1="72" x2="53" y2="116" />
+                  <line x1="157" y1="72" x2="157" y2="116" />
+                  <line x1="53" y1="145" x2="53" y2="189" />
+                  <line x1="157" y1="145" x2="157" y2="189" />
+                </g>
+                <g class="dmg t">
+                  <path d="M105 55L116 82L100 112L120 150L106 214" fill="none" stroke="#8C5A3C" stroke-width="3" />
+                  <path d="M0 120L18 128L10 140" fill="none" stroke="#8C5A3C" stroke-width="3" />
+                  <polygon points="186,118 210,110 210,176 194,162 200,140" fill="#A9654A" />
+                  <g fill="#C98463">
+                    <rect x="192" y="124" width="14" height="5" />
+                    <rect x="196" y="140" width="12" height="5" />
+                    <rect x="194" y="156" width="14" height="5" />
+                  </g>
+                  <polygon points="150,0 182,0 196,16 170,22" fill="#7A6A5E" />
+                </g>
+              </g>
+            </g>
+
+            <g class="hB" transform="translate(350,330)">
+              <g class="intact t">
+                <rect x="0" y="45" width="200" height="200" fill="#E7B585" />
+                <polygon points="-12,50 24,0 176,0 212,50" fill="#3B4C86" />
+                <rect x="-12" y="46" width="224" height="8" fill="#2E3C6E" />
+                <g fill="#4A9BC0" stroke="#FFF3DE" stroke-width="5">
+                  <rect x="26" y="78" width="48" height="46" />
+                  <rect x="126" y="78" width="48" height="46" />
+                  <rect x="26" y="160" width="48" height="46" />
+                  <rect x="126" y="160" width="48" height="46" />
+                </g>
+                <rect x="0" y="140" width="200" height="8" fill="#D9A06E" />
+              </g>
+              <g class="ruin t">
+                <path fill="#A9654A" d="M0 245V78L28 62L56 84L92 44L126 74L160 52L200 86V245Z" />
+                <rect x="-6" y="140" width="214" height="10" fill="#C98463" />
+                <g fill="#6B4030">
+                  <rect x="26" y="92" width="48" height="40" />
+                  <rect x="126" y="96" width="48" height="36" />
+                  <rect x="26" y="165" width="48" height="46" />
+                  <rect x="126" y="165" width="48" height="46" />
+                </g>
+                <path d="M92 168L110 150L104 200L122 245H70Z" fill="#8E5039" />
+                <g stroke="#7A4A30" stroke-width="7" stroke-linecap="round">
+                  <line x1="40" y1="40" x2="130" y2="18" />
+                  <line x1="70" y1="10" x2="104" y2="56" />
+                  <line x1="200" y1="100" x2="232" y2="90" />
+                  <line x1="200" y1="150" x2="226" y2="140" />
+                </g>
+                <path d="M-20 245C10 222 40 230 70 226C110 220 160 228 230 245Z" fill="#8C7466" />
+              </g>
+            </g>
+
+            <g transform="translate(800,385)">
+              <g class="hC tb t">
+                <rect x="0" y="45" width="200" height="145" fill="#F1C995" />
+                <polygon points="-12,50 26,0 174,0 212,50" fill="#3B4C86" />
+                <rect x="-12" y="46" width="224" height="8" fill="#2E3C6E" />
+                <g fill="#4A9BC0" stroke="#FFF3DE" stroke-width="5">
+                  <rect x="30" y="80" width="46" height="42" />
+                  <rect x="124" y="80" width="46" height="42" />
+                </g>
+                <rect x="82" y="128" width="36" height="62" fill="#A0623C" />
+                <rect x="140" y="140" width="40" height="10" fill="#E3B47C" />
+              </g>
+            </g>
+
+            <path fill="url(#earthG)"
+              d="M0 600C120 566 260 557 420 567C560 576 640 581 780 577C920 573 1060 567 1200 573V700H0Z" />
+            <g fill="#9A7A64" opacity=".8">
+              <ellipse cx="80" cy="630" rx="14" ry="6" />
+              <ellipse cx="260" cy="655" rx="10" ry="4" />
+              <ellipse cx="470" cy="620" rx="12" ry="5" />
+              <ellipse cx="900" cy="640" rx="16" ry="6" />
+              <ellipse cx="1100" cy="615" rx="10" ry="4" />
+            </g>
+
+            <g transform="translate(320,572)">
+              <g class="tree tb t">
+                <path d="M0 0C6-30-6-52 10-84M10-84L-12-110M10-84L32-104M3-46L-22-62M8-66L24-74" fill="none"
+                  stroke="#5A3A2A" stroke-width="8" stroke-linecap="round" />
+              </g>
+            </g>
+
+            <polygon class="fissure tb t" fill="#26180F"
+              points="572,574 618,578 604,606 628,640 600,700 582,700 594,642 574,606" />
+            <path class="crack" pathLength="1" d="M260 560L278 588L264 612L286 646L276 690" />
+            <path class="crack" pathLength="1" style="transition-delay:.3s" d="M470 568L460 596L482 622L468 660" />
+            <path class="crack" pathLength="1" style="transition-delay:.5s"
+              d="M720 580L740 606L728 634L752 668L744 700" />
+            <path class="crack" pathLength="1" style="transition-delay:.7s" d="M980 572L966 600L990 628L980 652" />
+            <path class="crack" pathLength="1" style="transition-delay:.4s" d="M600 640L650 650L690 676" />
+            <path class="crack" pathLength="1" style="transition-delay:.6s" d="M120 590L100 616L118 640" />
+
+            <path class="mud t" fill="url(#mudG)"
+              d="M700 700V600C760 568 820 578 880 598C960 624 1040 592 1110 606C1160 616 1200 606 1200 606V700Z" />
+            <g fill="#6E5446">
+              <circle class="rock t" cx="760" cy="590" r="10" style="transition-delay:.2s" />
+              <circle class="rock t" cx="820" cy="600" r="7" style="transition-delay:.35s" />
+              <circle class="rock t" cx="690" cy="584" r="12" style="transition-delay:.5s" />
+            </g>
+
+            <circle class="dust" cx="450" cy="560" r="30" />
+            <circle class="dust" cx="500" cy="545" r="22" style="animation-delay:.8s" />
+            <circle class="dust" cx="870" cy="575" r="28" style="animation-delay:.4s" />
+            <circle class="dust" cx="940" cy="565" r="20" style="animation-delay:1.2s" />
+            <circle class="dust" cx="300" cy="560" r="18" style="animation-delay:1.6s" />
+          </g>
+        </g>
+        <g id="wR" clip-path="url(#cR)"></g>
+
+        <rect class="haze" width="1200" height="700" fill="#C9B59A" />
+      </svg>
+    </div>
+
+    <main class="story">
+      <section class="step hero" data-step="0">
+        <div class="card">
+          <h1>Bumi yang Tak Pernah Diam: Membaca Pola Gempa Indonesia 2008–2023</h1>
+          <p>Sebuah desa di kaki gunung, beberapa menit sebelum gempa. Scroll untuk mengikuti apa yang terjadi.</p>
+          <div class="hint" style="color:red">Scroll ke bawah</div>
+        </div>
+      </section>
+      <section class="step" data-step="1">
+        <div class="card">
+          <div class="time">Pukul 10.21</div>
+          <h2>Guncangan pertama</h2>
+          <p>Gelombang seismik merambat dari pusat gempa di bawah lereng. Dalam hitungan detik, seluruh desa ikut
+            bergetar.</p>
+        </div>
+      </section>
+      <section class="step" data-step="2">
+        <div class="card">
+          <div class="time">Detik ke-15</div>
+          <h2>Tanah mulai retak</h2>
+          <p>Tanah lereng yang jenuh air tidak mampu menahan getaran. Retakan memanjang membelah halaman dan jalan desa.
+          </p>
+        </div>
+      </section>
+      <section class="step" data-step="3">
+        <div class="card">
+          <div class="time">Detik ke-40</div>
+          <h2>Rumah-rumah runtuh</h2>
+          <p>Dinding tanpa tulangan memadai retak dan ambruk. Bangunan yang berdiri di atas tanah labil mulai miring.
+          </p>
+        </div>
+      </section>
+      <section class="step" data-step="4">
+        <div class="card">
+          <div class="time">Pukul 10.35</div>
+          <h2>Longsor menyusul</h2>
+          <p>Gempa susulan memicu tanah dari bukit meluncur turun dan menimbun sebagian permukiman.</p>
+        </div>
+      </section>
+      <section class="step" data-step="5">
+        <div class="card">
+          <h2>Setelah guncangan</h2>
+          <p>Pemetaan zona rawan, bangunan tahan gempa, dan jalur evakuasi yang jelas dapat mengurangi korban pada
+            kejadian berikutnya.</p>
+        </div>
+      </section>
+      <section class="step" data-step="6">
+        <div class="card">
+          <div class="time">Menulusuri Gempa di Indonesia</div>
+          <h3>Guncangan pertama bukan akhir cerita</h3>
+          <p>Gempa terjadi hampir setiap hari di Indonesia.
+            Sebagian besar berkekuatan kecil, tetapi gempa besar
+            dapat diikuti aktivitas seismik selama berhari-hari.
+
+            <br><br>
+          <p style="color: #6a2410;font-size: 12px;">Scroll ke dalam retakan untuk mengungkap pola gempa
+            Indonesia sepanjang 2008–2023.</p>
+          </p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section class="canyon" id="canyon">
+    <div class="walls" id="walL"></div>
+    <div class="walls" id="walR"></div>
+    <div class="gauge" id="gauge"><span>Kedalaman<br>(ilustrasi)</span><b id="depth">0 km</b></div>
+    <div class="lane">
+
+      <article class="chapter" style="margin-bottom: 10px;">
+        <div class="txt-narasi reveal" style="width: 1500px !important;">
+
+          <h2>Di Balik Ribuan Guncangan</h2>
+
+          <p>
+            Kita mungkin sudah sering mendengar bahwa Indonesia merupakan
+            wilayah rawan gempa. Namun, seberapa sering gempa sebenarnya
+            tercatat? Di mana kejadian tersebut terkonsentrasi? Dan apa
+            yang terjadi setelah gempa besar mengguncang suatu wilayah?. 
+            Katalog gempa Indonesia periode November 2008 hingga Januari
+            2023 mencatat <strong>89.075 kejadian</strong>, dengan rata-rata
+            sekitar <strong>17 gempa per hari</strong>. Bahkan, pada periode
+            2017–2022, hanya sekitar <strong>1 dari 200 hari</strong>
+            yang tidak memiliki catatan gempa.
+
+            <br><br>
+            Namun, <strong>seringnya gempa terjadi tidak berarti semuanya
+              berkekuatan besar</strong>. Sebagian besar kejadian memiliki
+            magnitudo rendah, sementara gempa besar yang lebih jarang
+            terjadi dapat diikuti aktivitas seismik selama berhari-hari.
+            Melalui tujuh visualisasi berikut, kita akan menelusuri
+            pola persebaran gempa, karakteristik magnitudo dan kedalamannya,
+            hingga aktivitas yang tercatat setelah gempa besar.
+          </p>
+
+          <br><p>
+            <small>
+              Perlu diingat, data ini menggambarkan
+              <strong>gempa yang tercatat, bukan seluruh gempa yang terjadi</strong>.
+              Seiring berkembangnya jaringan pemantauan, gempa kecil
+              semakin banyak terdeteksi. Karena itu, jumlah kejadian
+              antartahun tidak dapat langsung diartikan sebagai
+              peningkatan aktivitas gempa.
+            </small>
+          </p>
+
+          <p style="margin-top: 32px;">
+            <strong>
+              Mari mulai dari persebaran episentrum gempa di seluruh Indonesia.
+            </strong>
+          </p>
+
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Grafik 1 dari 7</div>
+          <h2>Persebaran Episentrum Gempa</h2>
+          <p>Di mana gempa-gempa itu terjadi? Bayangkan 89 ribu titik ditebar di peta dan dibagi menjadi kotak-kotak
+            kecil, makin gelap warnanya, makin banyak gempa yang tercatat di kotak itu.</p>
+        </div>
+        <div class="chart reveal"><!--VIZ_01_START-->
+          <div class="ph">Grafik 1 belum dimasukkan</div><!--VIZ_01_END-->
+        </div>
+        <div class="txt reveal">
+          <p><br>Hampir separuh catatan terkonsentrasi pada hanya 4,3% sel peta, membentuk sabuk aktivitas yang
+            membentang sepanjang kepulauan Indonesia.
+            Separuh catatan menumpuk di kurang dari 5% luas peta, mengikuti pertemuan lempeng bumi dari ujung Sumatra,
+            melintasi selatan Jawa dan Nusa Tenggara, lalu membelok ke Sulawesi
+            dan Maluku. Sebaliknya, kawasan Borneo nyaris kosong, hanya 0,2% dari seluruh catatan. Sabuk itu membentang
+            ribuan kilometer, tetapi <b>apakah semua bagiannya sama aktif?</b>
+            <br><br>Kalau sabuk itu kita potong-potong menjadi kawasan, siapa yang paling sering terguncang?
+          </p>
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Grafik 2 dari 7</div>
+          <h2>Kawasan dengan Jumlah Catatan Gempa Terbanyak</h2>
+          <p>Kawasan atau wilayah mana yang mencatat kejadian gempa terbanyak?</p>
+        </div>
+        <div class="chart reveal"><!--VIZ_02_START-->
+          <div class="ph">Grafik 2 belum dimasukkan</div><!--VIZ_02_END-->
+        </div>
+        <div class="txt reveal">
+          <p><br>Semenanjung Minahasa di Sulawesi memimpin dengan 9.294 kejadian, disusul Sulawesi, Sumbawa, dan Jawa.
+            Sepuluh kawasan teratas saja sudah menyumbang sekitar dua pertiga dari seluruh catatan. Tidak ada satu pulau
+            yang mendominasi, artinya,
+            aktivitas tinggi terbagi di sepanjang sabuk. Hal tersebut menjawab klaim pertama terkait aktivitas gempa di
+            Indonesia bahwa pada periode pencatatan lengkap, gempa tercatat hampir setiap hari, dan aktivitasnya
+            terpusat di sabuk kepulauan.</p>
+          <br><br>
+          <p>Kita sudah tahu di mana saja wilayah yang paling sering terguncang. Sekarang, <b>seberapa kuat guncangan
+              itu?</b></p>
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Grafik 3 dari 7</div>
+          <h2>Kategori Magnitudo</h2>
+          <p>Apakah gempa berkekuatan besar sering terjadi di Indonesia?</p>
+        </div>
+        <div class="chart reveal"><!--VIZ_03_START-->
+          <div class="ph">Grafik 3 belum dimasukkan</div><!--VIZ_03_END-->
+        </div>
+        <div class="txt reveal"><br>
+          <p><b>Gempa Besar Justru Sangat Jarang Tercatat. </b>
+            Berdasarkan klasifikasi magnitudo yang dicantumkan BMKG, gempa M3–3,9 termasuk kecil, M4–4,9 ringan, M5–5,9
+            sedang, M6–6,9 kuat, dan M7 ke atas termasuk besar hingga hebat.
+            Dalam katalog gempa Indonesia, sekitar 70% kejadian memiliki magnitudo di bawah 4, sedangkan gempa
+            bermagnitudo 6 atau lebih hanya tercatat sebanyak 242 kejadian (0,27%).
+            Meskipun sebagian besar gempa memiliki magnitudo rendah, gempa berkekuatan besar tetap terjadi.
+
+            <br><br>Namun, apakah besarnya magnitudo juga berkaitan dengan kedalaman pusat gempa?
+          </p>
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Grafik 4 dari 7</div>
+          <h2>Hubungan Magnitudo dan Kedalaman</h2>
+          <p>Bagaimana sebaran magnitudo gempa pada berbagai kedalaman?</p>
+        </div>
+        <div class="chart reveal"><!--VIZ_04_START-->
+          <div class="ph">Grafik 4 belum dimasukkan</div><!--VIZ_04_END-->
+        </div>
+        <div class="txt reveal"><br>
+          <p><b>Gempa Besar Pun Banyak yang Berpusat Dangkal. </b>
+            Selain magnitudo, kedalaman pusat gempa menjadi karakteristik penting untuk dipahami. BMKG membagi gempa
+            berdasarkan kedalamannya menjadi tiga kategori: dangkal (kurang dari 60 km), menengah (60–300 km), dan dalam
+            (lebih dari 300 km).
+            Dalam katalog gempa Indonesia, sebanyak 77,3% kejadian tergolong dangkal. Bahkan, sekitar 6 dari 10 gempa
+            bermagnitudo 6 atau lebih juga memiliki pusat gempa pada kedalaman kurang dari 60 km.
+            Titik merah menunjukkan semua gempa M≥6, dan sebagian besar berkumpul di dekat permukaan, yang mana 145 dari
+            242 (60%) berpusat dangkal. Namun perlu diketahui bahwa semakin besar gempanya, makin jarang ia dangkal.
+            Karena
+            dari 21 gempa dengan kekuatan M≥7, hanya 9 yang merupakan gempa dangkal. Temuan ini menjawab klaim bahwa
+            mayoritas gempa merupakan kecil dan dangkal, namun gempa M≥6 juga tidak selalu terjadi jauh di dalam bumi.
+
+            <br><br>Gempa besar yang dangkal adalah kombinasi paling berbahaya. Di mana gempa-gempa terbesar pernah
+            tercatat?
+          </p>
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Grafik 5 dari 7</div>
+          <h2>Gempa Bermagnitudo Terbesar</h2>
+          <p>Di mana gempa-gempa terbesar pernah tercatat?</p>
+        </div>
+        <div class="chart reveal"><!--VIZ_05_START-->
+          <div class="ph">Grafik 5 belum dimasukkan</div><!--VIZ_05_END-->
+        </div>
+        <div class="txt reveal"><br>
+          <p>Sepuluh gempa terkuat (M7.3–7.9) tersebar di sepanjang sabuk yang sama dengan peta pertama.
+            Yang terkuat adalah M7.9 di Papua pada Januari 2009, disusul gempa M7.5 di wilayah yang sama sekitar tiga
+            jam kemudian.
+            Sumatra mencatat tiga gempa M7.7, dan sisanya tersebar di Sulawesi, Kepulauan Tanimbar, Laut Flores, dan
+            Laut Banda.
+            Enam dari sepuluh berpusat dangkal. Gempa terbesar tidak datang dari tempat asing, melainkan dari sabuk yang
+            sama yang bergetar
+            setiap hari.
+
+            <br><br> Salah satunya terjadi di Palu pada 28 September 2018: M7.5 dengan kedalaman hanya 10 km, gempa
+            besar yang dangkal.
+            Apa yang terjadi di sekitarnya setelah guncangan utama?
+          </p>
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Grafik 6 dari 7</div>
+          <h2>Kejadian Gempa Besar di Palu pada 2018</h2>
+          <p>Apakah masih tercatat gempa lain di sekitar episentrum setelah gempa utama?</p>
+        </div>
+        <div class="txt reveal">
+          <p>Pada 28 September 2018, gempa besar mengguncang Palu dan sekitarnya. Peristiwa ini tidak hanya menimbulkan
+            kerusakan akibat guncangan, tetapi juga memicu tsunami di Teluk Palu serta likuefaksi yang menghancurkan
+            permukiman, termasuk di Balaroa, Petobo, dan Jono Oge.
+            Bencana gempa, tsunami, dan likuefaksi tersebut diperkirakan menyebabkan 4.340 korban jiwa di Sulawesi
+            Tengah.
+          </p>
+        </div>
+        <div class="chart reveal"><!--VIZ_06_START-->
+          <div class="ph">Grafik 6 belum dimasukkan</div><!--VIZ_06_END-->
+        </div>
+        <div class="txt reveal">
+          <p><br>Aktivitas seismik juga tidak langsung berhenti. Dalam 14 hari periode pengamatan setelah gempa utama,
+            katalog mencatat 426
+            kejadian gempa, dengan 112 kejadian pada hari pertama. Panel atas menunjukkan 18 susulan di antaranya
+            bermagnitudo 5 atau lebih, cukup kuat untuk merusak bangunan yang sudah retak.
+            Meski jumlahnya cenderung menurun, aktivitas yang tercatat masih berada di atas tingkat pembanding hingga
+            hari ke-14. Hal ini menjawab klaim bahwa gempa besar diikuti oleh
+            susulan yang berhari-hari, sehingga kewaspadaan tetap diperlukan setelah guncangan utama berakhir.
+            <br><br>Kalau satu gempa besar dapat memicu ratusan susulan, jejaknya seharusnya terlihat dalam pola waktu
+            jangka panjang. Heatmap berikut menampilkan gempa dangkal M≥5 yang berpotensi merusak, ditampilkan per bulan
+            selama 15
+            tahun.
+          </p>
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Grafik 7 dari 7</div>
+          <h2>Gempa Dangkal M≥5 menurut Tahun dan Bulan</h2>
+          <p>Bagaimana sebaran waktu catatan gempa dangkal M≥5?</p>
+        </div>
+        <div class="chart reveal"><!--VIZ_07_START-->
+          <div class="ph">Grafik 7 belum dimasukkan</div><!--VIZ_07_END-->
+        </div>
+        <div class="txt reveal">
+          <p><br>Heatmap ini menunjukkan dua hal. Pertama, gempa dangkal yang berpotensi merusak muncul hampir setiap
+            bulan; ancamannya rutin, bukan musiman. Kedua, bulan-bulan paling padat bukan terjadi secara acak. Sel
+            berbingkai hitam adalah bulan yang didominasi susulan satu gempa besar: Januari 2009 (107 kejadian, susulan
+            M7,9 Papua), Agustus 2018 (49, rangkaian Lombok), Februari 2009 (40, Talaud), dan Juli 2019 (36, Halmahera).
+            Lonjakan terbesar dalam 15 tahun mengikuti gempa besar dangkal, sehingga pola jangka panjang ini menguatkan
+            apa yang terlihat di Palu. </p>
+        </div>
+      </article>
+
+      <article class="chapter">
+        <div class="txt reveal">
+          <div class="eyebrow">Penutup</div>
+          <div class="txt reveal">
+            <hr><br>
+            <h2>Jadi, Apa Artinya untuk Kita?</h2>
+
+            <div class="txt reveal">
+              <p>Data katalog BMKG menceritakan tiga hal. Gempa terjadi hampir setiap hari di sepanjang sabuk kepulauan
+                yang mengikuti batas lempeng. Sebagian besar gempa itu kecil dan dangkal; gempa kuat langka, tetapi
+                terjadi sekitar 17 kali setahun dan sering dangkal. Ketika gempa besar yang dangkal terjadi, bahayanya
+                tidak berhenti pada guncangan pertama, susulan dapat berlangsung berhari-hari, dan sebagian cukup kuat
+                untuk
+                merusak.<br><br>
+              <h3>Yang Bisa Kita Lakukan</h3>
+
+              <ul>
+                <li>
+                  Kenali jalur evakuasi dan titik kumpul di sekitarmu,
+                  lalu latih bersama keluarga.
+                </li>
+                <li>Siapkan tas siaga bencana.</li>
+                <li>
+                  Setelah gempa besar, jangan buru-buru masuk ke bangunan
+                  yang mungkin rusak.
+                </li>
+                <li>Ikuti arahan resmi BMKG dan BPBD setempat.</li>
+              </ul>
+              </p>
+
+              <p>
+                <br>
+              <h2 style="color: #cc7756;">Guncangan pertama bukan akhir cerita.</h2>
+              </p>
+
+              <p>
+                <small>
+                  <strong>Catatan keterbatasan: </strong>
+                  katalog memiliki celah pencatatan sebelum 2015, 39% kedalamannya bernilai
+                  default 10 km, dan sebagian kecil catatan M≥6 tidak terkonfirmasi di katalog USGS. Angka-angka di atas
+                  sudah memperhitungkan keterbatasan tersebut.
+                </small>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <br>
+        <div class="eyebrow">
+          <h3>Referensi</h3>
+        </div>
+        <hr><br>
+        <div class="txt reveal">
+          <ol style="font-size: 14px;">
+            <li>
+              National Centers for Environmental Information. (2020).
+              <em>Sulawesi, Indonesia, earthquake and tsunami,
+                September 28, 2018</em>. NOAA.
+              <a href="https://www.ngdc.noaa.gov/hazard/28sep2018.html" target="_blank" rel="noopener noreferrer">
+                Lihat sumber
+              </a>
+            </li>
+
+            <li>
+              Badan Geologi. (2023).
+              <em>Mengenang lima tahun gempa bumi Palu Sigi Donggala
+                (Pasigala) tanggal 28 September 2018</em>.
+              Kementerian ESDM.
+              <a href="https://geologi.esdm.go.id/index.php/media-center/mengenang-lima-tahun-gempa-bumi-palu-sigi-donggala-pasigala-tanggal-28-september-2018"
+                target="_blank" rel="noopener noreferrer">
+                Lihat sumber
+              </a>
+            </li>
+
+            <li>
+              Pribadi, S., et al. (2018).
+              <em>Merekam jejak tsunami Palu 2018</em>. BMKG.
+              <a href="https://www.bmkg.go.id/artikel/merekam-jejak-tsunami-palu-2018" target="_blank"
+                rel="noopener noreferrer">
+                Lihat sumber
+              </a>
+            </li>
+
+            <li>
+              Badan Meteorologi, Klimatologi, dan Geofisika. (2025).
+              <em>Buletin geofisika: Februari 2025</em>.
+              <a href="https://lampung.bmkg.go.id/doc/bulletin/bulGeofisika_202502.pdf" target="_blank"
+                rel="noopener noreferrer">
+                Lihat sumber
+              </a>
+            </li>
+          </ol>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!--PLOTLY_JS-->
+  <script>
+    (function () {
+      var MAX = 6, body = document.body, $ = function (i) { return document.getElementById(i) };
+      var cp = $("wc").cloneNode(true); cp.removeAttribute("id"); $("wR").appendChild(cp);
+      var clamp = function (x) { return Math.min(1, Math.max(0, x)) }, ease = function (t) { return t * t * (3 - 2 * t) };
+      var magData = [["0,0", "Kondisi normal"], ["6,2", "Guncangan kuat"], ["6,8", "Puncak guncangan"], ["6,8", "Kerusakan bangunan"], ["5,1", "Gempa susulan"], ["0,0", "Guncangan berhenti"], ["–", "Menelusuri data"]];
+      var magEl = $("mag"), noteEl = $("magNote"), dotsEl = $("dots");
+      for (var i = 0; i <= MAX; i++) dotsEl.appendChild(document.createElement("span"));
+      var dots = dotsEl.children;
+      function setStep(n) {
+        if (String(n) === body.dataset.step) return;
+        body.dataset.step = n;
+        for (var i = 0; i <= MAX; i++) { body.classList.toggle("s" + i, i <= n); dots[i].classList.toggle("on", i === n); }
+        magEl.textContent = magData[n][0]; noteEl.textContent = magData[n][1];
+      }
+      dots[0].classList.add("on");
+      var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) setStep(parseInt(e.target.dataset.step, 10)); }); }, { rootMargin: "-45% 0px -45% 0px" });
+      document.querySelectorAll(".step").forEach(function (s) { io.observe(s); });
+
+      // Parallax ringan
+      var layers = document.querySelectorAll(".px"), ticking = false;
+      function parallax() {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(function () {
+          var max = document.documentElement.scrollHeight - innerHeight, p = max > 0 ? scrollY / max : 0;
+          layers.forEach(function (l) { l.style.transform = "translateY(" + (p * parseFloat(l.dataset.depth) * 140) + "px)"; });
+          ticking = false;
+        });
+      }
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) addEventListener("scroll", parallax, { passive: true });
+
+      // Tanah membuka saat transisi; dinding jurang memiliki lebar visual tetap.
+      // Jangan gunakan lebar jurang untuk memaksa lebar grafik Plotly.
+      var gapU = 560, step6 = document.querySelector('.step[data-step="6"]');
+      function geo() {
+        var W = innerWidth, H = innerHeight, sc = Math.max(W / 1200, H / 700);
+        gapU = Math.min(560, 0.8 * W / sc);
+      }
+      function split() {
+        var r = step6.getBoundingClientRect(), g = ease(clamp((innerHeight * .85 - r.top) / (innerHeight * .85))) * gapU;
+        $("wL").setAttribute("transform", "translate(" + (-g / 2) + ",0)");
+        $("wR").setAttribute("transform", "translate(" + (g / 2) + ",0)");
+        $("core").setAttribute("x", 600 - g / 2); $("core").setAttribute("width", g);
+      }
+
+      // Dinding jurang bergerigi (kiri menjorok, kanan menonjol)
+      var seed = 11;
+      function rnd() { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }
+      function jag() {
+        var H = $("walL").offsetHeight, st = 70, MAXO = 26, n = Math.ceil(H / st), o = [];
+        seed = 11; for (var i = 0; i <= n; i++) o.push(4 + rnd() * 22);
+        var L = ["0 0", "calc(100% - " + o[0] + "px) 0"], R = [(MAXO - o[0]) + "px 0", "100% 0"];
+        var tp = function (y) { return 8 * Math.min(1, y / (innerHeight * .7)); };
+        for (var j = 1; j <= n; j++) { var y = Math.min(j * st, H); L.push("calc(100% - " + (o[j] + tp(y)) + "px) " + y + "px"); R.unshift((MAXO - o[j] + tp(y)) + "px " + y + "px"); }
+        L.push("0 " + H + "px"); R.splice(R.length - 1, 0, "100% " + H + "px");
+        $("walL").style.clipPath = "polygon(" + L.join(",") + ")"; $("walR").style.clipPath = "polygon(" + R.join(",") + ")";
+      }
+
+      // Plotly sudah responsif: gunakan resize, bukan transform scale.
+      function fit() {
+        document.querySelectorAll('.plotly-graph-div').forEach(function (g) {
+          g.style.width = '100%';
+          g.style.transform = 'none';
+          if (window.Plotly && g._fullLayout) { window.Plotly.Plots.resize(g); }
+        });
+      }
+      if (window.ResizeObserver) {
+        new ResizeObserver(function () { fit(); }).observe(document.querySelector('.lane'));
+      }
+      document.querySelectorAll(".chart").forEach(function (el) {
+        var bar = document.createElement("div"); bar.className = "lockbar"; bar.textContent = "Klik untuk berinteraksi · gulir untuk melanjutkan";
+        el.appendChild(bar);
+        bar.addEventListener("click", function () { bar.style.display = "none"; });
+        el.addEventListener("mouseleave", function () { bar.style.display = "flex"; });
+      });
+      var io2 = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add("in"); io2.unobserve(e.target); } }); }, { threshold: .15 });
+      document.querySelectorAll(".reveal").forEach(function (el) { io2.observe(el); });
+
+      var canyon = $("canyon");
+      function gauge() {
+        var r = canyon.getBoundingClientRect(), inside = r.top < innerHeight * .5 && r.bottom > innerHeight * .5;
+        $("gauge").style.opacity = inside ? 1 : 0;
+        $("depth").textContent = "≈ " + Math.round(clamp((innerHeight * .5 - r.top) / r.height) * 700) + " km";
+      }
+      function layout() { geo(); split(); jag(); gauge(); requestAnimationFrame(fit); }
+      addEventListener("scroll", function () { split(); gauge(); }, { passive: true });
+      addEventListener("resize", layout);
+      new ResizeObserver(jag).observe(canyon);
+      layout();
+    })();
+  </script>
+</body>
+
+</html>
