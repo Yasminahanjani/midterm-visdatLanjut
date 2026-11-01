@@ -300,7 +300,7 @@ def create_figures(df):
     # kerangka(fig, (f"Tidak merata: separuh catatan berada di hanya {angka(pct_area_50, 1)}% sel peta, membentuk sabuk "
     #                "yang mengikuti batas lempeng.<br>Setiap kotak = sel 0,5° (±55 km); "
     #                "warna = jumlah kejadian pada skala logaritmik."),
-    #          tinggi=500, lebar=1000, atas=106, bawah=30, kiri=8, kanan=8)
+            #  tinggi=500, lebar=1000, atas=106, bawah=30, kiri=8, kanan=8)
     fig.update_geos(domain=dict(x=[0, 0.915], y=[0, 1]))
     figures.append(fig)
 
